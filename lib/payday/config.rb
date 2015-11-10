@@ -25,7 +25,7 @@ module Payday
       self.date_format = "%B %e, %Y"
       self.currency = "USD"
       self.page_size = "LETTER"
-      self.pdf_font_size = "8"
+      self.pdf_font_size = 8
       self.pdf_font = "Helvetica-Bold"
     end
 
