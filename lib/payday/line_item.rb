@@ -12,8 +12,8 @@ module Payday
     # Initializes a new LineItem
     def initialize(options = {})
       self.quantity = options[:quantity] || "1"
-      self.display_quantity = options[:display_quantity]
-      self.display_price = options[:display_price]
+      self.display_quantity = options[:display_quantity] || options[:quantity] || "1"
+      self.display_price = options[:display_price] || options[:price] || "0.00"
       self.price = options[:price] || "0.00"
       self.description = options[:description] || ""
     end

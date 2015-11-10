@@ -18,6 +18,7 @@ module Payday
       pdf = Prawn::Document.new(page_size: invoice_or_default(invoice, :page_size))
 
       # set up some default styling
+      pdf.font "#{Prawn::DATADIR}/fonts/DejaVuSans.ttf"
       pdf.font_size(8)
 
       stamp(invoice, pdf)
@@ -45,7 +46,7 @@ module Payday
 
       if stamp
         pdf.bounding_box([150, pdf.cursor - 50], width: pdf.bounds.width - 300) do
-          pdf.font("Helvetica-Bold") do
+          pdf.font("#{Prawn::DATADIR}/fonts/DejaVuSans.ttf") do
             pdf.fill_color "cc0000"
             pdf.text stamp, align: :center, size: 25, rotate: 15
           end
@@ -125,6 +126,16 @@ module Payday
         table_data << [bold_cell(pdf, I18n.t("payday.invoice.invoice_no", default: "Invoice #:")),
                        bold_cell(pdf, invoice.invoice_number.to_s, align: :right)]
       end
+
+      # invoice variable symbol
+      if defined?(invoice.variable_symbol) && invoice.variable_symbol
+        table_data << [bold_cell(pdf, I18n.t("payday.invoice.variable_symbol", default: "Variable Symbol:")),
+                       bold_cell(pdf, invoice.variable_symbol.to_s, align: :right)]
+      end
+
+      # bank account
+      table_data << [bold_cell(pdf, I18n.t("payday.invoice.bank_account", default: "Bank Account:")),
+                    bold_cell(pdf, invoice_or_default(invoice, :bank_account).strip, align: :right)]
 
       # invoice date
       if defined?(invoice.invoice_date) && invoice.invoice_date
@@ -222,7 +233,7 @@ module Payday
         cell(pdf, number_to_currency(invoice.subtotal, invoice), align: :right)
       ]
 
-      if invoice.tax_rate > 0
+      if invoice.respond_to?(:tax_rate) && invoice.tax_rate > 0
         if invoice.tax_description.nil?
           tax_description = I18n.t("payday.invoice.tax", default: "Tax:")
         else
@@ -234,7 +245,8 @@ module Payday
           cell(pdf, number_to_currency(invoice.tax, invoice), align: :right)
         ]
       end
-      if invoice.shipping_rate > 0
+
+      if invoice.respond_to?(:shipping_rate) && invoice.shipping_rate > 0
         if invoice.shipping_description.nil?
           shipping_description =
             I18n.t("payday.invoice.shipping", default: "Shipping:")
@@ -265,7 +277,7 @@ module Payday
     def self.notes(invoice, pdf)
       if defined?(invoice.notes) && invoice.notes
         pdf.move_cursor_to(pdf.cursor - 30)
-        pdf.font("Helvetica-Bold") do
+        pdf.font("#{Prawn::DATADIR}/fonts/DejaVuSans.ttf") do
           pdf.text(I18n.t("payday.invoice.notes", default: "Notes"))
         end
         pdf.line_width = 0.5

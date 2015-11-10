@@ -1,0 +1,27 @@
+cs:
+  payday:
+    status:
+      paid: ZAPLACENO
+      overdue: PO SPLATNOSTI
+      refund: STORNO
+    invoice:
+      bill_to: "Odběratel:"
+      ship_to: "Doručeno:"
+      bank_account: "Číslo účtu:"
+      variable_symbol: "Variabilní symbol:"
+      invoice_date: "Datum vystavení:"
+      refunded_date: "Datum storna:"
+      invoice_no: "Faktura č.:"
+      due_date: "Datum splatnosti:"
+      paid_date: "Zaplaceno:"
+      subtotal: "Mezisoučet:"
+      shipping: "Dopravné:"
+      tax: "DPH:"
+      total: "Celkem:"
+      notes: "Poznámka"
+    line_item:
+      description: Popis
+      tax: "DPH"
+      unit_price: Cena za jednotku
+      quantity: Množství
+      amount: Celkem

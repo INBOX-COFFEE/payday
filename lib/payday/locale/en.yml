@@ -8,6 +8,8 @@ en:
       bill_to: Bill To
       ship_to: Ship To
       invoice_no: "Invoice #:"
+      invoice_date: "Invoice Date:"
+      refunded_date: "Refunded Date:"
       due_date: "Due Date:"
       paid_date: "Paid Date:"
       subtotal: "Subtotal:"

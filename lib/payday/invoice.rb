@@ -4,10 +4,13 @@ module Payday
     include Payday::Invoiceable
 
     attr_accessor :invoice_number, :bill_to, :ship_to, :notes, :line_items, :shipping_rate, :shipping_description,
-      :tax_rate, :tax_description, :due_at, :paid_at, :refunded_at, :currency, :invoice_details, :invoice_date
+      :tax_rate, :tax_description, :due_at, :paid_at, :refunded_at, :currency, :invoice_details, :invoice_date,
+      :variable_symbol, :bank_account
 
     def initialize(options =  {})
       self.invoice_number = options[:invoice_number] || nil
+      self.variable_symbol = options[:variable_symbol] || nil
+      self.bank_account = options[:back_account] || nil
       self.bill_to = options[:bill_to] || nil
       self.ship_to = options[:ship_to] || nil
       self.notes = options[:notes] || nil
