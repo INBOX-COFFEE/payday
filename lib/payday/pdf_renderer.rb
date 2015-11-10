@@ -19,7 +19,7 @@ module Payday
 
       # set up some default styling
       pdf.font "#{Prawn::DATADIR}/fonts/DejaVuSans.ttf"
-      pdf.font_size(8)
+      pdf.font_size(12)
 
       stamp(invoice, pdf)
       company_banner(invoice, pdf)
