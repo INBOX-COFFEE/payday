@@ -22,6 +22,7 @@ module Payday
       pdf.font_families.update(Payday::Config.default.pdf_font_families) if Payday::Config.default.pdf_font_families
       pdf.font Payday::Config.default.pdf_font if Payday::Config.default.pdf_font
 
+      invoice_header(invoice, pdf)
       stamp(invoice, pdf)
       company_banner(invoice, pdf)
       bill_to_ship_to(invoice, pdf)
@@ -35,6 +36,17 @@ module Payday
       pdf
     end
 
+    def self.invoice_header(invoice, pdf)
+      table_data = []
+      table_data << [bold_cell(pdf, I18n.t('payday.invoice.title'), size: 20, align: :left),
+                     bold_cell(pdf, invoice.invoice_number, size: 20, align: :right)]
+      table = pdf.make_table(table_data, cell_style: { borders: [], padding: 0 }, width: pdf.bounds.width)
+ 
+      pdf.bounding_box([0, pdf.bounds.top], width: pdf.bounds.width) do
+        table.draw
+      end
+    end
+
     def self.stamp(invoice, pdf)
       stamp = nil
       if invoice.refunded?
@@ -46,7 +58,7 @@ module Payday
       end
 
       if stamp
-        pdf.bounding_box([150, pdf.cursor - 50], width: pdf.bounds.width - 300) do
+        pdf.bounding_box([150, pdf.cursor - 60], width: pdf.bounds.width - 300) do
           pdf.font(Payday::Config.default.pdf_font) do
             pdf.fill_color "cc0000"
             pdf.text stamp, align: :center, size: 25, rotate: 15
@@ -58,6 +70,7 @@ module Payday
     end
 
     def self.company_banner(invoice, pdf)
+      pdf.move_cursor_to (pdf.bounds.top - 40)
       # render the logo
       image = invoice_or_default(invoice, :invoice_logo)
       height = nil
@@ -71,10 +84,10 @@ module Payday
       end
 
       if File.extname(image) == ".svg"
-        logo_info = pdf.svg(File.read(image), at: pdf.bounds.top_left, width: width, height: height)
+        logo_info = pdf.svg(File.read(image), at: [pdf.bounds.left, pdf.bounds.top - 30], width: width, height: height)
         logo_height = logo_info[:height]
       else
-        logo_info = pdf.image(image, at: pdf.bounds.top_left, width: width, height: height)
+        logo_info = pdf.image(image, at: [pdf.bounds.left, pdf.bounds.top - 30], width: width, height: height)
         logo_height = logo_info.scaled_height
       end
 
@@ -85,11 +98,11 @@ module Payday
       invoice_or_default(invoice, :company_details).lines.each { |line| table_data << [line] }
 
       table = pdf.make_table(table_data, cell_style: { borders: [], padding: 0 })
-      pdf.bounding_box([pdf.bounds.width - table.width, pdf.bounds.top], width: table.width, height: table.height + 5) do
+      pdf.bounding_box([pdf.bounds.width - table.width, pdf.bounds.top - 30 ], width: table.width, height: table.height + 5) do
         table.draw
       end
 
-      pdf.move_cursor_to(pdf.bounds.top - logo_height - 20)
+      pdf.move_cursor_to(pdf.bounds.top - logo_height - 60)
     end
 
     def self.bill_to_ship_to(invoice, pdf)
@@ -273,7 +286,7 @@ module Payday
         cell(pdf, number_to_currency(invoice.total, invoice),
              size: 12, align: :right)
       ]
-      table = pdf.make_table(table_data, cell_style: { borders: [] })
+      table = pdf.make_table(table_data, cell_style: { borders: [] }, width: (pdf.bounds.width/2).round.to_i)
       pdf.bounding_box([pdf.bounds.width - table.width, pdf.cursor],
                        width: table.width, height: table.height + 2) do
 

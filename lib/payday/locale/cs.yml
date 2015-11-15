@@ -5,6 +5,7 @@ cs:
       overdue: PO SPLATNOSTI
       refunded: STORNO
     invoice:
+      title: "Faktura - daňový doklad"
       bill_to: "Odběratel"
       ship_to: "Doručovací adresa:"
       invoice_no: "Faktura č.:"

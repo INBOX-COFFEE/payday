@@ -5,6 +5,7 @@ en:
       overdue: OVERDUE
       refunded: REFUNDED
     invoice:
+      title: Invoice
       bill_to: Bill To
       ship_to: Ship To
       invoice_no: "Invoice #:"
