@@ -10,12 +10,16 @@ en:
       invoice_no: "Invoice #:"
       due_date: "Due Date:"
       paid_date: "Paid Date:"
+      invoice_date: "Invoice Date:"
+      vat_date: "Tax Date:"
       subtotal: "Subtotal:"
       shipping: "Shipping:"
       tax: "Tax:"
-      total: "Total:"
+      total: "Total with tax:"
     line_item:
       description: Description
       unit_price: Unit Price
       quantity: Quantity
       amount: Amount
+      tax: Tax
+      amount_tax: 'Amount+Tax'

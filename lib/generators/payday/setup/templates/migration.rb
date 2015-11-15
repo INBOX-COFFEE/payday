@@ -14,7 +14,7 @@ class CreatePaydayTables < ActiveRecord::Migration
       t.integer :quantity     # can also be :decimal or :float - just needs to be numeric
 
       t.references :<%= options.invoice_name.underscore %>
-
+      t.float :tax
       t.timestamps
     end
   end

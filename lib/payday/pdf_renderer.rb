@@ -128,6 +128,18 @@ module Payday
                        bold_cell(pdf, invoice.invoice_number.to_s, align: :right)]
       end
 
+      # VAT date
+      if defined?(invoice.tax_date) && invoice.tax_date
+        if invoice.tax_date.is_a?(Date) || invoice.tax_date.is_a?(Time)
+          tax_date = invoice.tax_date.strftime(Payday::Config.default.date_format)
+        else
+          tax_date = invoice.tax_date.to_s
+        end
+
+        table_data << [bold_cell(pdf, I18n.t("payday.invoice.tax_date", default: "Tax Date:")),
+                       bold_cell(pdf, tax_date, align: :right)]
+      end
+
       # invoice date
       if defined?(invoice.invoice_date) && invoice.invoice_date
         if invoice.invoice_date.is_a?(Date) || invoice.invoice_date.is_a?(Time)
@@ -189,25 +201,33 @@ module Payday
 
     def self.line_items_table(invoice, pdf)
       table_data = []
-      table_data << [bold_cell(pdf, I18n.t("payday.line_item.description", default: "Description"), borders: []),
-                     bold_cell(pdf, I18n.t("payday.line_item.unit_price", default: "Unit Price"), align: :center, borders: []),
-                     bold_cell(pdf, I18n.t("payday.line_item.quantity", default: "Quantity"), align: :center, borders: []),
-                     bold_cell(pdf, I18n.t("payday.line_item.amount", default: "Amount"), align: :center, borders: [])]
+      table_data << [bold_cell(pdf, I18n.t("payday.line_item.description", default: "Description"), borders: [], size: 8 ),
+                     bold_cell(pdf, translate_with_currency("payday.line_item.unit_price", invoice), align: :center, borders: [], size: 8 ),
+                     bold_cell(pdf, I18n.t("payday.line_item.quantity", default: "Quantity"), align: :center, borders: [], size: 8 ),
+                     bold_cell(pdf, I18n.t("payday.line_item.tax", default: "Tax")+"\n[%]", align: :center, borders: [], size: 8 ),
+                     bold_cell(pdf, translate_with_currency("payday.line_item.amount", invoice), align: :center, borders: [], size: 8 ),
+                     bold_cell(pdf, translate_with_currency("payday.line_item.amount_tax", invoice), align: :center, borders: [], size: 8 )]
       invoice.line_items.each do |line|
         table_data << [line.description,
-                       (line.display_price || number_to_currency(line.price, invoice)),
-                       (line.display_quantity || BigDecimal.new(line.quantity.to_s).to_s("F")),
-                       number_to_currency(line.amount, invoice)]
+                       (line.price.to_s || number_to_currency(line.price, invoice)),
+                       (line.quantity.to_s || BigDecimal.new(line.quantity.to_s).to_s("F")),
+                       (line.tax_percent.to_i.to_s),
+                       (line.amount.to_s || number_to_currency(line.amount, invoice)),
+                       (line.amount_tax.to_s || number_to_currency(line.amount_tax, invoice))]
       end
 
       pdf.move_cursor_to(pdf.cursor - 20)
       pdf.table(table_data, width: pdf.bounds.width, header: true,
                 cell_style: { border_width: 0.5, border_color: "cccccc",
-                              padding: [5, 10] },
+                              padding: [5, 5] },
                 row_colors: %w(dfdfdf ffffff)) do
 
         # left align the number columns
-        columns(1..3).rows(1..row_length - 1).style(align: :right)
+        columns(1..5).rows(1..row_length - 1).style(align: :right, size: 10)
+        columns(1..1).with = 65
+        columns(2..2).width = 45
+        columns(3..3).width = 30
+        columns(4..5).width = 65
 
         # set the column widths correctly
         natural = natural_column_widths
@@ -224,18 +244,15 @@ module Payday
         cell(pdf, number_to_currency(invoice.subtotal, invoice), align: :right)
       ]
 
-      if invoice.respond_to?(:tax_rate) && invoice.tax_rate > 0
-        if invoice.tax_description.nil?
-          tax_description = I18n.t("payday.invoice.tax", default: "Tax:")
-        else
-          tax_description = invoice.tax_description
-        end
-
+      invoice.taxes.each do |rate,amount|
+        tax_description = "#{I18n.t("payday.invoice.tax")} (#{(rate*100).to_i.to_s}%):"
+        tax_amount = (rate*amount)
         table_data << [
           bold_cell(pdf, tax_description),
-          cell(pdf, number_to_currency(invoice.tax, invoice), align: :right)
+          cell(pdf, number_to_currency(tax_amount, invoice), align: :right)
         ]
       end
+
       if invoice.respond_to?(:shipping_rate) && invoice.shipping_rate > 0
         if invoice.shipping_description.nil?
           shipping_description =
@@ -306,6 +323,10 @@ module Payday
       number *= currency.subunit_to_unit
       number = number.round unless Money.infinite_precision
       Money.new(number, currency).format
+    end
+
+    def self.translate_with_currency(translate, invoice)
+      "#{I18n.t(translate)}\n[#{Money::Currency.wrap(invoice_or_default(invoice, :currency)).symbol}]"
     end
 
     def self.max_cell_width(cell_proxy)

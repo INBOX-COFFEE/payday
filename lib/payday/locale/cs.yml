@@ -1,0 +1,28 @@
+cs:
+  payday:
+    status:
+      paid: ZAPLACENO
+      overdue: PO SPLATNOSTI
+      refunded: STORNO
+    invoice:
+      bill_to: "Odběratel"
+      ship_to: "Doručovací adresa:"
+      invoice_no: "Faktura č.:"
+      invoice_date: "Datum vystavení:"
+      refunded_date: "Datum storna:"
+      vat_date: "Datum uskutečnění plnění:"
+      due_date: "Datum splatnosti:"
+      paid_date: "Datum platby:"
+      subtotal: "Mezisoučet bez DPH:"
+      tax: "DPH"
+      total: "Celkem:"
+      variable_symbol: "Variabilní symbol:"
+      bank_account: "Číslo účtu:"
+      notes: Poznámka
+    line_item:
+      description: Popis
+      unit_price: Cena za MJ
+      quantity: Počet
+      amount: Cena
+      amount_vat: Cena s DPH
+      tax: DPH

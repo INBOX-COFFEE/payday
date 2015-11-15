@@ -3,6 +3,7 @@ module Payday
   # Payday::Config.default.company_name = "Awesome Corp".
   class Config
     attr_accessor :invoice_logo, :company_name, :company_details, :date_format, :currency, :pdf_font_families, :pdf_font, :pdf_font_size, :bank_account
+    attr_accessor :default_tax
 
     # Sets the page size to use. See the
     # {http://prawn.majesticseacreature.com/docs/0.10.2/Prawn/Document/PageGeometry.html Prawn documentation} for valid
@@ -28,6 +29,7 @@ module Payday
       self.page_size = "LETTER"
       self.pdf_font_size = 8
       self.pdf_font = "Helvetica-Bold"
+      self.default_tax = 0.0
     end
 
     # Internal: Contruct a new config object.

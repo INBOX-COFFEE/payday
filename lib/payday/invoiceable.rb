@@ -23,6 +23,10 @@ module Payday::Invoiceable
     line_items.reduce(BigDecimal.new("0")) { |result, item| result += item.amount }
   end
 
+  def taxes
+    line_items.group(:tax).sum("quantity*price")
+  end
+
   # The tax for this invoice, as a BigDecimal
   def tax
     if defined?(tax_rate)

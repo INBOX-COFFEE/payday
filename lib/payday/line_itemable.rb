@@ -5,4 +5,13 @@ module Payday::LineItemable
   def amount
     price * quantity
   end
+
+  def amount_tax
+    price * quantity * (1 + ( tax? ? tax : 0))
+  end
+
+  def tax_percent
+    "#{(tax * 100).to_s}%"
+  end
+
 end
